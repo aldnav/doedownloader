@@ -1,26 +1,30 @@
-DOE Downloader
----
+# DOE Downloader
 
 A simple downloader for retail prices publicly available at [Department of Energy](https://www.doe.gov.ph/)  
 
 ```console
-ENV_FILE=~/path-to-env/.env ./bin/downloader
-Downloaded a file petro_ncr_2022-may-12.pdf with size 232249
-Downloaded a file petro_sluz_2022-may-10_batangas-rizal-quezon.pdf with size 134209
-Downloaded a file petro_sluz_2022-may-10_bicol-region.pdf with size 142377
-Downloaded a file petro_sluz_2022-may-10_cavite.pdf with size 154803
-Downloaded a file petro_sluz_2022-may-10_laguna.pdf with size 123602
-Downloaded a file petro_sluz_2022-may-10_mimaropa.pdf with size 161979
-Downloaded a file petro_nluz_2022-may-13.pdf with size 335998
-Downloaded a file petro-vis_2022-may-10.pdf with size 1198965
-Downloaded a file petro_min_2022-may-10.pdf with size 379392
+$ ENV_FILE=~/path-to-env/.env ./bin/downloader
+[.] Looking for latest report
+[.] Reading from report file: /Users/pro/retailprices/reports/2022-06-21_retail_pump.json
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_ncr_2022-jun-14.pdf with size 235666
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_batangas-rizal-quezon.pdf with size 135598
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_bicol-region.pdf with size 143221
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_cavite.pdf with size 157091
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_laguna.pdf with size 124484
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_mimaropa.pdf with size 164074
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_nluz_2022-jun-17.pdf with size 348019
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_vis_2022-jun-07.pdf with size 798977
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_min_2022-jun-14.pdf with size 243889
+[.] Done!
 ```
+
+## Input
 
 Example env file
 
 ```env
-REPORTS_DIRECTORY=/Users/arthurmorgan/petro/reports
-COOKIE_PATH=/Users/arthurmorgan/petro/cookies.json
+REPORTS_DIRECTORY=/Users/pro/retailprices/reports
+COOKIE_PATH=/Users/pro/retailprices/tests/cookies.json
 ```
 
 Example reports file (JSON)
@@ -41,4 +45,60 @@ Example reports file (JSON)
 ]
 ```
 
+## Building
 
+Building natively
+
+```console
+go build -o bin/downloader
+```
+
+Or using Docker build
+
+```console
+DOCKER_BUILDKIT=1 docker build --tag docker-doedownloader-test .
+```
+
+## Running
+
+```console
+$ ENV_FILE=~/path-to-env/.env ./bin/downloader
+[.] Looking for latest report
+[.] Reading from report file: /Users/pro/retailprices/reports/2022-06-21_retail_pump.json
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_ncr_2022-jun-14.pdf with size 235666
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_batangas-rizal-quezon.pdf with size 135598
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_bicol-region.pdf with size 143221
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_cavite.pdf with size 157091
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_laguna.pdf with size 124484
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_sluz_2022-jun-14_mimaropa.pdf with size 164074
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_nluz_2022-jun-17.pdf with size 348019
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_vis_2022-jun-07.pdf with size 798977
+[.] Downloaded a file /Users/pro/retailprices/reports/2022-06-21/petro_min_2022-jun-14.pdf with size 243889
+[.] Done!
+```
+
+And in Docker
+
+```console
+docker run -v /Users/pro/retailprices/reports:/app/data -v /Users/pro/retailprices/tests/cookies.json:/tmp/cookies.json docker-doedownloader
+[.] Looking for latest report
+[.] Reading from report file: /app/data/2022-06-21_retail_pump.json
+[.] Downloaded a file /app/data/2022-06-21/petro_ncr_2022-jun-14.pdf with size 235666
+[.] Downloaded a file /app/data/2022-06-21/petro_sluz_2022-jun-14_batangas-rizal-quezon.pdf with size 135598
+[.] Downloaded a file /app/data/2022-06-21/petro_sluz_2022-jun-14_bicol-region.pdf with size 143221
+[.] Downloaded a file /app/data/2022-06-21/petro_sluz_2022-jun-14_cavite.pdf with size 157091
+[.] Downloaded a file /app/data/2022-06-21/petro_sluz_2022-jun-14_laguna.pdf with size 124484
+[.] Downloaded a file /app/data/2022-06-21/petro_sluz_2022-jun-14_mimaropa.pdf with size 164074
+[.] Downloaded a file /app/data/2022-06-21/petro_nluz_2022-jun-17.pdf with size 348019
+[.] Downloaded a file /app/data/2022-06-21/petro_vis_2022-jun-07.pdf with size 798977
+[.] Downloaded a file /app/data/2022-06-21/petro_min_2022-jun-14.pdf with size 243889
+[.] Done!
+```
+
+## Pitfalls and gotchas
+
+1. The downloaded files are not valid PDF
+
+    Try to check the cookies file. Visit the DOE website and copy every cookie you see.
+    Then paste them into the cookies file.
+    Then try to download the files again.

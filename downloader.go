@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"encoding/json"
@@ -24,6 +24,9 @@ var reportFileInput string
 var cookiePath string
 
 func readEnv(key string) string {
+	if os.Getenv(key) != "" {
+		return os.Getenv(key)
+	}
 	envFile := os.Getenv("ENV_FILE")
 	if envFile == "" {
 		envFile = ".env"
@@ -66,6 +69,7 @@ type ReportLog []struct {
 
 func readLinksFromReport() []string {
 	// Identify latest report using the format (YYYY-MM-DD_retail_pump.json)
+	fmt.Println("[.] Looking for latest report")
 	candidateFiles, err := filepath.Glob(reportsDirectory + "/*_retail_pump.json")
 	if err != nil {
 		log.Fatal(err)
@@ -76,6 +80,7 @@ func readLinksFromReport() []string {
 	}
 	sort.Strings(candidateFiles)
 	reportFileInput = candidateFiles[len(candidateFiles)-1]
+	fmt.Println("[.] Reading from report file: " + reportFileInput)
 	reportFile, err := ioutil.ReadFile(reportFileInput)
 	if err != nil {
 		log.Fatal(err)
@@ -210,11 +215,12 @@ func downloadFile(link, directoryPath string) {
 
 	defer file.Close()
 
-	fmt.Printf("Downloaded a file %s with size %d\n", fileName, size)
+	fmt.Printf("[.] Downloaded a file %s with size %d\n", directoryPath+"/"+fileName, size)
 }
 
 func main() {
 	validateArguments()
 	links := readLinksFromReport()
 	downloadReports(links)
+	fmt.Println("[.] Done!")
 }
