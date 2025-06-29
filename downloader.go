@@ -50,14 +50,6 @@ func validateArguments() {
 		os.Exit(1)
 	}
 	cookiePath = readEnv("COOKIE_PATH")
-	if cookiePath == "" {
-		fmt.Println("COOKIE_PATH is not set")
-		os.Exit(1)
-	}
-	if _, err := os.Stat(cookiePath); os.IsNotExist(err) {
-		fmt.Println("COOKIE_PATH does not exist")
-		os.Exit(1)
-	}
 }
 
 type ReportLog []struct {
@@ -153,21 +145,6 @@ func getCookieFromFile(name string) (http.Cookie, error) {
 		}
 	}
 	return http.Cookie{}, errors.New("Cookie not found")
-
-	// NOTE: Can't use this because it doesn't work with the same-site cookie
-	// // Parse cookie file
-	// var cookies []*http.Cookie
-	// err = json.Unmarshal(cookieFile, &cookies)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// // Find cookie with name
-	// for _, cookie := range cookies {
-	// 	if cookie.Name == name {
-	// 		return *cookie, nil
-	// 	}
-	// }
-	// return http.Cookie{}, errors.New("Cookie not found")
 }
 
 func downloadFile(link, directoryPath string) {
@@ -197,12 +174,16 @@ func downloadFile(link, directoryPath string) {
 		},
 		Jar: jar,
 	}
-	cookie, err := getCookieFromFile("AKSYONSHIELD")
-	if err == nil {
-		urlObj, _ := url.Parse(link)
-		client.Jar.SetCookies(urlObj, []*http.Cookie{&cookie})
-	} else {
-		log.Fatal(err)
+
+	// Use cookie if COOKIE_PATH is provided
+	if cookiePath != "" {
+		cookie, err := getCookieFromFile("AKSYONSHIELD")
+		if err == nil {
+			urlObj, _ := url.Parse(link)
+			client.Jar.SetCookies(urlObj, []*http.Cookie{&cookie})
+		} else {
+			fmt.Printf("[!] Warning: Could not load cookie: %v\n", err)
+		}
 	}
 	// Put content on file
 	resp, err := client.Get(link)
