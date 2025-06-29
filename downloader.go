@@ -16,6 +16,8 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+
+	_ "golang.org/x/crypto/x509roots/fallback"
 )
 
 // Global variables
@@ -60,19 +62,26 @@ type ReportLog []struct {
 }
 
 func readLinksFromReport() []string {
-	// Identify latest report using the format (YYYY-MM-DD_retail_pump.json)
-	fmt.Println("[.] Looking for latest report")
-	candidateFiles, err := filepath.Glob(reportsDirectory + "/*_retail_pump.json")
-	if err != nil {
-		log.Fatal(err)
+	// Check if a positional argument is provided for the input file
+	if len(os.Args) > 1 {
+		reportFileInput = os.Args[1]
+		fmt.Println("[.] Reading from provided report file: " + reportFileInput)
+	} else {
+		// Identify latest report using the format (YYYY-MM-DD_retail_pump.json)
+		fmt.Println("[.] Looking for latest report")
+		candidateFiles, err := filepath.Glob(reportsDirectory + "/*_retail_pump.json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if len(candidateFiles) == 0 {
+			fmt.Println("No reports found")
+			os.Exit(1)
+		}
+		sort.Strings(candidateFiles)
+		reportFileInput = candidateFiles[len(candidateFiles)-1]
+		fmt.Println("[.] Reading from report file: " + reportFileInput)
 	}
-	if len(candidateFiles) == 0 {
-		fmt.Println("No reports found")
-		os.Exit(1)
-	}
-	sort.Strings(candidateFiles)
-	reportFileInput = candidateFiles[len(candidateFiles)-1]
-	fmt.Println("[.] Reading from report file: " + reportFileInput)
+
 	reportFile, err := ioutil.ReadFile(reportFileInput)
 	if err != nil {
 		log.Fatal(err)
@@ -99,7 +108,7 @@ func readLinksFromReport() []string {
 
 func downloadReports(links []string) {
 	// Create directory for the downloaded reports
-	directoryPath := strings.Split(reportFileInput, "_")[0]
+	directoryPath := reportsDirectory
 	err := os.MkdirAll(directoryPath, 0755)
 	if err != nil {
 		log.Fatal(err)

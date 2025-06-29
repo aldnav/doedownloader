@@ -45,6 +45,18 @@ Example reports file (JSON)
 ]
 ```
 
+## Usage
+
+```console
+./bin/downloader
+```
+
+Optionally, you can provide a report file as an argument:
+
+```console
+./bin/downloader /Users/pro/retailprices/reports/2022-06-21_retail_pump.json
+```
+
 ## Building
 
 Building natively
